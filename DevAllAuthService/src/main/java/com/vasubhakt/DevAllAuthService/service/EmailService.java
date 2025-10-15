@@ -13,13 +13,16 @@ public class EmailService {
     @Value("%{spring.mail.username}")
     private String from;
 
+    @Value("${server.port}")
+    private String serverPort;
+
     public EmailService(JavaMailSender mailSender) {
         this.mailSender = mailSender;
     }
 
     public void sendVerificationEmail(String to, String token) {
         String subject = "Verify your email - DevAll";
-        String verificationUrl = "http://localhost:8080/auth/verify?token=" + token;
+        String verificationUrl = "http://localhost:"+serverPort+"/auth/verify?token=" + token;
 
         String body = "Click the link to verify your email:\n" + verificationUrl;
 
