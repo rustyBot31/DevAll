@@ -12,7 +12,7 @@
 	<artifactId>DevAllAuthService</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>DevAllAuthService</name>
-	<description>Eureka Server for DevAll</description>
+	<description>Auth Service for DevAll</description>
 	<url/>
 	<licenses>
 		<license/>
