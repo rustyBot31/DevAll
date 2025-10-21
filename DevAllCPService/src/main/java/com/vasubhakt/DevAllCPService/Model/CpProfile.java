@@ -21,5 +21,6 @@ public class CpProfile {
     private CFProfile cfPorfile; // Codeforces Profile
     private LCProfile lcProfile; // Leetcode Profile
     private CCProfile ccProfile; // Codechef Profile
+    private ACProfile acProfile; // Atcoder Profile
 
 }
