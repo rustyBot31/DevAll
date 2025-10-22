@@ -1,6 +1,5 @@
 package com.vasubhakt.DevAllCPService.Model;
 
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -16,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 public class CpProfile {
     
     @Id
-    private ObjectId id;
+    private String id;
 
     private CFProfile cfPorfile; // Codeforces Profile
     private LCProfile lcProfile; // Leetcode Profile

@@ -2,7 +2,6 @@ package com.vasubhakt.DevAllAuthService.model;
 
 import java.time.LocalDateTime;
 
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -13,11 +12,11 @@ import lombok.Data;
 public class VerificationToken {
 
     @Id
-    private ObjectId id;
+    private String id;
 
     private String token;
 
-    private ObjectId userId;
+    private String userId;
 
     private LocalDateTime expiryDate;
     
