@@ -18,7 +18,7 @@ public class EmailServiceImpl implements EmailService {
     @Value("%{spring.mail.username}")
     private String from;
 
-    @Value("${server.port}")
+    @Value("${api-gateway.port}")
     private String serverPort;
 
     public void sendVerificationEmail(String to, String token) {

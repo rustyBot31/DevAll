@@ -61,8 +61,11 @@ public class AuthServiceImpl implements AuthService{
     @Override
     public LoginResponse login(LoginRequest request) {
         Optional<User> optionalUser = userRepo.findByEmail(request.getEmail());
-        if(optionalUser.isEmpty() || !passwordEncoder.matches(request.getPassword(), optionalUser.get().getPassword())) {
-            throw new RuntimeException("Invalid email or password");
+        if(optionalUser.isEmpty()) {
+            throw new RuntimeException("User not found");
+        }
+        if(!passwordEncoder.matches(request.getPassword(), optionalUser.get().getPassword())) {
+            throw new RuntimeException("Invalid credentials");
         }
         User user = optionalUser.get();
         if(!user.isEnabled()) {
