@@ -14,13 +14,13 @@ import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 public class RabbitMQConfig {
     
     @Value("${rabbitmq.queue}")
-    private String queue;
+    public static String queue;
 
     @Value("${rabbitmq.exchange}")
-    private String exchange;
+    public static String exchange;
 
     @Value("${rabbitmq.routingkey}")
-    private String routingKey;
+    public static String routingKey;
 
     @Bean
     public TopicExchange exchange() {
