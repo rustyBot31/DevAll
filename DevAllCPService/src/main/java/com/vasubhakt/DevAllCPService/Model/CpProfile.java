@@ -17,7 +17,7 @@ public class CpProfile {
     @Id
     private String id;
 
-    private CFProfile cfPorfile; // Codeforces Profile
+    private CFProfile cfProfile; // Codeforces Profile
     private LCProfile lcProfile; // Leetcode Profile
     private CCProfile ccProfile; // Codechef Profile
     private ACProfile acProfile; // Atcoder Profile
