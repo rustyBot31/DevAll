@@ -8,6 +8,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.vasubhakt.DevAllAuthService.client.CPClient;
 import com.vasubhakt.DevAllAuthService.dto.LoginRequest;
 import com.vasubhakt.DevAllAuthService.dto.LoginResponse;
 import com.vasubhakt.DevAllAuthService.model.User;
@@ -26,13 +27,16 @@ public class AuthServiceImpl implements AuthService{
     private final AuthenticationManager authManager;
     private final JwtUtil jwtUtil;
     private final EmailService emailService;
+    private final CPClient cpClient;
 
     @Override
     public String register(User user) {
         if(userRepo.existsByEmail(user.getEmail())) {
-            throw new RuntimeException("User with email " + user.getEmail() + " already exists");
+            throw new RuntimeException("User with email " + user.getUsername() + " already exists");
         }
-
+        if(userRepo.existsByUsername(user.getUsername())) {
+            throw new RuntimeException("User with username " + user.getUsername() + " already exists");
+        }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setEnabled(false);
 
@@ -55,6 +59,7 @@ public class AuthServiceImpl implements AuthService{
         user.setEnabled(true);
         user.setVerificationToken(null);
         userRepo.save(user);
+        cpClient.createCPProfile(user.getUsername());
         return "User verified successfully!";
     }
 

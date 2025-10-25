@@ -31,6 +31,16 @@ public class CPController {
         }
     }
 
+    @PostMapping("/create/{username}")
+    public ResponseEntity<?> createUserProfile(@PathVariable String username) {
+        try {
+            createUserProfile(username);
+            return ResponseEntity.ok("CP Profile created successfully");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @PostMapping("/update/{userId}")
     public ResponseEntity<?> updateUserProfile(@PathVariable String userId, @RequestBody CpProfile updatedProfile) {
         try {

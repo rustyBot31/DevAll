@@ -21,6 +21,13 @@ public class CPServiceImpl implements CPService {
     }
     
     @Override
+    public void createUserProfile(String id) {
+        CpProfile profile = new CpProfile();
+        profile.setId(id);
+        cpRepo.save(profile);
+    }
+    
+    @Override
     public CpProfile updateUserProfile(String id, CpProfile updatedProfile) {
         CpProfile profile = cpRepo.findByUserId(id)
               .orElseThrow(() -> new RuntimeException("User CP Profile not found"));
