@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 @FeignClient(name = "CP-SERVICE")
 public interface CPClient {
 
-    @PostMapping("/create/{username}")
-    public void createCPProfile(@PathVariable String username);
+    @PostMapping("/cp/create/{username}")
+    public void createCPProfile(@PathVariable("username") String username);
     
 }

@@ -5,7 +5,8 @@ import org.springframework.web.bind.annotation.*;
 
 import com.vasubhakt.DevAllAuthService.dto.LoginRequest;
 import com.vasubhakt.DevAllAuthService.dto.LoginResponse;
-import com.vasubhakt.DevAllAuthService.model.User;
+import com.vasubhakt.DevAllAuthService.dto.SignupRequest;
+import com.vasubhakt.DevAllAuthService.dto.SignupResponse;
 import com.vasubhakt.DevAllAuthService.service.AuthService;
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.Valid;
@@ -25,10 +26,10 @@ public class AuthController {
 
     // SIGNUP
     @PostMapping("/signup")
-    public ResponseEntity<?> register(@Valid @RequestBody User user) {
+    public ResponseEntity<?> register(@Valid @RequestBody SignupRequest request) {
         try {
-            String message = authService.register(user);
-            return ResponseEntity.ok(message);
+            SignupResponse response = authService.register(request);
+            return ResponseEntity.ok(response.getMessage());
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

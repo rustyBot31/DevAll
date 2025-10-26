@@ -2,11 +2,12 @@ package com.vasubhakt.DevAllAuthService.service;
 
 import com.vasubhakt.DevAllAuthService.dto.LoginRequest;
 import com.vasubhakt.DevAllAuthService.dto.LoginResponse;
-import com.vasubhakt.DevAllAuthService.model.User;
+import com.vasubhakt.DevAllAuthService.dto.SignupRequest;
+import com.vasubhakt.DevAllAuthService.dto.SignupResponse;
 
 public interface AuthService {
 
-    String register(User user);
+    SignupResponse register(SignupRequest request);
     String verifyUser(String token);
     LoginResponse login(LoginRequest request);
     

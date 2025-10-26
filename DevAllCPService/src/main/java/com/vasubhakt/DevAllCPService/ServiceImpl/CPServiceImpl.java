@@ -15,21 +15,21 @@ public class CPServiceImpl implements CPService {
     private final CpProfileRepo cpRepo;
 
     @Override
-    public CpProfile getUserProfile(String id) {
-        return cpRepo.findByUserId(id)
+    public CpProfile getUserProfile(String username) {
+        return cpRepo.findByUsername(username)
               .orElseThrow(() -> new RuntimeException("User CP Profile not found"));
     }
     
     @Override
     public void createUserProfile(String id) {
         CpProfile profile = new CpProfile();
-        profile.setId(id);
+        profile.setUsername(id);
         cpRepo.save(profile);
     }
-    
+
     @Override
-    public CpProfile updateUserProfile(String id, CpProfile updatedProfile) {
-        CpProfile profile = cpRepo.findByUserId(id)
+    public CpProfile updateUserProfile(String username, CpProfile updatedProfile) {
+        CpProfile profile = cpRepo.findByUsername(username)
               .orElseThrow(() -> new RuntimeException("User CP Profile not found"));
         if(updatedProfile.getCfProfile()!=null) {
             profile.setCfProfile(updatedProfile.getCfProfile());
@@ -47,8 +47,8 @@ public class CPServiceImpl implements CPService {
     }
 
     @Override
-    public CpProfile deleteUserProfile(String id) {
-        CpProfile profile = cpRepo.findByUserId(id)
+    public CpProfile deleteUserProfile(String username) {
+        CpProfile profile = cpRepo.findByUsername(username)
               .orElseThrow(() -> new RuntimeException("User CP Profile not found"));
         cpRepo.delete(profile);
         return profile;
