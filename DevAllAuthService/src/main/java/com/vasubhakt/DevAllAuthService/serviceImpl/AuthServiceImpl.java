@@ -22,12 +22,11 @@ import com.vasubhakt.DevAllAuthService.service.EmailService;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
-import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class AuthServiceImpl implements AuthService{
+public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepo;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authManager;
@@ -40,13 +39,14 @@ public class AuthServiceImpl implements AuthService{
     @Retry(name = "CPRetry", fallbackMethod = "cpFallback")
     @RateLimiter(name = "CPRateLimiter", fallbackMethod = "cpFallback")
     public SignupResponse register(SignupRequest request) {
-        if(userRepo.existsByEmail(request.getEmail())) {
+        if (userRepo.existsByEmail(request.getEmail())) {
             throw new RuntimeException("User with email already exists");
         }
-        if(userRepo.existsByUsername(request.getUsername())) {
+        if (userRepo.existsByUsername(request.getUsername())) {
             throw new RuntimeException("User with username already exists");
         }
-        if(request.getEmail()==null || request.getUsername()==null || request.getPassword()==null || request.getEmail().isEmpty() || request.getUsername().isEmpty() || request.getPassword().isEmpty()) {
+        if (request.getEmail() == null || request.getUsername() == null || request.getPassword() == null
+                || request.getEmail().isEmpty() || request.getUsername().isEmpty() || request.getPassword().isEmpty()) {
             throw new RuntimeException("Neccessary fields missing");
         }
         User user = new User();
@@ -61,7 +61,8 @@ public class AuthServiceImpl implements AuthService{
 
         String link = token;
         emailService.sendVerificationEmail(user.getEmail(), link);
-        SignupResponse response = new SignupResponse(user.getUsername(), user.getEmail(), "User registered successfully! Please check your mail for verification");
+        SignupResponse response = new SignupResponse(user.getUsername(), user.getEmail(),
+                "User registered successfully! Please check your mail for verification");
         return response;
     }
 
@@ -71,7 +72,7 @@ public class AuthServiceImpl implements AuthService{
     @RateLimiter(name = "CPRateLimiter", fallbackMethod = "cpFallback")
     public String verifyUser(String token) {
         Optional<User> optionalUser = userRepo.findByVerificationToken(token);
-        if(optionalUser.isEmpty()) {
+        if (optionalUser.isEmpty()) {
             throw new RuntimeException("Invalid verification token");
         }
         User user = optionalUser.get();
@@ -79,7 +80,7 @@ public class AuthServiceImpl implements AuthService{
         user.setEnabled(true);
         user.setVerificationToken(null);
         userRepo.save(user);
-        
+
         return "User verified successfully!";
     }
 
@@ -89,14 +90,14 @@ public class AuthServiceImpl implements AuthService{
     @RateLimiter(name = "CPRateLimiter", fallbackMethod = "cpFallback")
     public LoginResponse login(LoginRequest request) {
         Optional<User> optionalUser = userRepo.findByEmail(request.getEmail());
-        if(optionalUser.isEmpty()) {
+        if (optionalUser.isEmpty()) {
             throw new RuntimeException("User not found");
         }
-        if(!passwordEncoder.matches(request.getPassword(), optionalUser.get().getPassword())) {
+        if (!passwordEncoder.matches(request.getPassword(), optionalUser.get().getPassword())) {
             throw new RuntimeException("Invalid credentials");
         }
         User user = optionalUser.get();
-        if(!user.isEnabled()) {
+        if (!user.isEnabled()) {
             throw new RuntimeException("Account not verified. Please check your email.");
         }
         authManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
@@ -104,8 +105,32 @@ public class AuthServiceImpl implements AuthService{
         return new LoginResponse(token, user.getEmail(), user.getRole());
     }
 
-    public String cpFallback(Exception e) {
-        return e.getMessage();
+    @Override
+    @CircuitBreaker(name = "CPBreaker", fallbackMethod = "cpFallback")
+    @Retry(name = "CPRetry", fallbackMethod = "cpFallback")
+    @RateLimiter(name = "CPRateLimiter", fallbackMethod = "cpFallback")
+    public String resendVerificationEmail(String email) {
+        Optional<User> optionalUser = userRepo.findByEmail(email);
+        if (optionalUser.isEmpty()) {
+            throw new RuntimeException("User with this email does not exist");
+        }
+
+        User user = optionalUser.get();
+
+        if (user.isEnabled()) {
+            throw new RuntimeException("Account already verified");
+        }
+
+        String newToken = UUID.randomUUID().toString();
+        user.setVerificationToken(newToken);
+        userRepo.save(user);
+        emailService.sendVerificationEmail(user.getEmail(), newToken);
+
+        return "Verification email resent successfully!";
+    }
+
+    public Object cpFallback(Throwable t) {
+        return "Oops! Something seems down. Please try again later.";
     }
 
 }

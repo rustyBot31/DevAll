@@ -10,5 +10,5 @@ public interface AuthService {
     SignupResponse register(SignupRequest request);
     String verifyUser(String token);
     LoginResponse login(LoginRequest request);
-    
+    String resendVerificationEmail(String email);
 }

@@ -39,22 +39,32 @@ public class AuthController {
     @GetMapping("/verify")
     public ResponseEntity<?> verifyUser(@RequestParam("token") String token) {
         try {
-            String message =  authService.verifyUser(token);
+            String message = authService.verifyUser(token);
             return ResponseEntity.ok(message);
-        } catch(Exception e) {
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
-    //LOGIN
+    // LOGIN
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
             LoginResponse response = authService.login(request);
             return ResponseEntity.ok(response);
-        } catch(Exception e) {
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-    
+
+    //RESEND VERIFICATION EMAIL
+    @GetMapping("/resend-verification")
+    public ResponseEntity<?> resendVerification(@RequestParam("email") String email) {
+        try {
+            String message = authService.resendVerificationEmail(email);
+            return ResponseEntity.ok(message);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }
