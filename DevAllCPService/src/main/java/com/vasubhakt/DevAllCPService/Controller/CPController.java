@@ -7,8 +7,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.vasubhakt.DevAllCPService.Messaging.CPProducer;
+import com.vasubhakt.DevAllCPService.Model.CPFetchRequest;
 import com.vasubhakt.DevAllCPService.Model.CpProfile;
 import com.vasubhakt.DevAllCPService.Service.CPService;
 
@@ -20,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 public class CPController {
     
     private final CPService cpService;
+    private final CPProducer cpProducer;
 
     @GetMapping("/get/{userId}")
     public ResponseEntity<?> getUserProfile(@PathVariable String userId) {
@@ -61,4 +65,14 @@ public class CPController {
         }
     }
 
+    @GetMapping("/fetch/{platform}")
+    public ResponseEntity<?> fetchCpProfile(@PathVariable("platform") String platform, @RequestParam("handle") String handle, @RequestParam("username") String username) {
+        try {
+            CPFetchRequest request = new CPFetchRequest(username,platform,handle);
+            cpProducer.sendFetchRequest(request);
+            return ResponseEntity.ok("Request for fetch sent!");
+        } catch(Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }

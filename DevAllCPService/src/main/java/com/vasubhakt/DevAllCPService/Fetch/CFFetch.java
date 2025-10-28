@@ -71,9 +71,10 @@ public class CFFetch {
 
             return new CFProfile(handle, rating, maxRating, submissionHeatMap, contestHistory);
 
+        } catch (IllegalArgumentException e) {
+            throw e; // custom invalid handle
         } catch (Exception e) {
-            e.printStackTrace();
-            return new CFProfile(handle, 0, 0, Collections.emptyMap(), Collections.emptyList());
+            throw new RuntimeException("Failed to fetch Codeforces data for " + handle, e);
         }
     }
 }

@@ -20,15 +20,18 @@ public class CFConsumer {
 
     private final ExternalAPIService externalApiService;
     private final CpProfileRepo cpRepo;
-
     @RabbitListener(queues = RabbitMQConfig.cfQueue, concurrency = "3-5")
     public void handle(CPFetchRequest request) {
         System.out.println("📩 Codeforces consumer received: " + request.getHandle());
         Optional<CpProfile> optionalProfile = cpRepo.findByUsername(request.getUsername());
         CpProfile profile = optionalProfile.get();
-
-        CFProfile cfProfile = externalApiService.fetchCfProfile(request.getHandle());
-        profile.setCfProfile(cfProfile);
-        cpRepo.save(profile);
+        try {
+            CFProfile cfProfile = externalApiService.fetchCfProfile(request.getHandle());
+            profile.setCfProfile(cfProfile);
+            cpRepo.save(profile);
+        } catch(Exception e) {
+            System.err.println("❌ Error fetching Codeforces profile for " + request.getHandle() + ": " + e.getMessage());
+        }
+        
     }
 }
