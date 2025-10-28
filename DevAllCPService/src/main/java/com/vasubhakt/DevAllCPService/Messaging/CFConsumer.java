@@ -20,6 +20,7 @@ public class CFConsumer {
 
     private final ExternalAPIService externalApiService;
     private final CpProfileRepo cpRepo;
+    
     @RabbitListener(queues = RabbitMQConfig.cfQueue, concurrency = "3-5")
     public void handle(CPFetchRequest request) {
         System.out.println("📩 Codeforces consumer received: " + request.getHandle());

@@ -3,6 +3,7 @@ package com.vasubhakt.DevAllCPService.ServiceImpl;
 import org.springframework.stereotype.Service;
 
 import com.vasubhakt.DevAllCPService.Fetch.CFFetch;
+import com.vasubhakt.DevAllCPService.Fetch.LCFetch;
 import com.vasubhakt.DevAllCPService.Model.ACProfile;
 import com.vasubhakt.DevAllCPService.Model.CCProfile;
 import com.vasubhakt.DevAllCPService.Model.CFProfile;
@@ -18,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ExternalAPIServiceImpl implements ExternalAPIService {
 
     private final CFFetch cfFetch;
+    private final LCFetch lcFetch;
 
     @Override
     public CFProfile fetchCfProfile(String handle) {
@@ -26,7 +28,7 @@ public class ExternalAPIServiceImpl implements ExternalAPIService {
 
     @Override
     public LCProfile fetchLcProfile(String handle) {
-        return new LCProfile();
+        return lcFetch.fetchProfile(handle);
     }
 
     @Override

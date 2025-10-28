@@ -13,8 +13,8 @@ import lombok.RequiredArgsConstructor;
 
 public class CFProfile {
     private String handle;
-    private int rating;
-    private int maxRating;
+    private Integer rating;
+    private Integer maxRating;
     private Map<String, Integer> submissionHeatMap; // date (YYYY-MM-DD) to number of submissions
     private List<ContestParticipation> contestHistory;
 }

@@ -36,8 +36,8 @@ public class CFFetch {
             // Extract and build response
             Map<?, ?> userResp = userFuture.get();
             Map<?, ?> user = ((List<Map<?, ?>>) userResp.get("result")).get(0);
-            int rating = user.get("rating") != null ? ((Number) user.get("rating")).intValue() : 0;
-            int maxRating = user.get("maxRating") != null ? ((Number) user.get("maxRating")).intValue() : 0;
+            Integer rating = user.get("rating") != null ? ((Number) user.get("rating")).intValue() : 0;
+            Integer maxRating = user.get("maxRating") != null ? ((Number) user.get("maxRating")).intValue() : 0;
 
             Map<?, ?> contestResp = contestFuture.get();
             List<ContestParticipation> contestHistory = new ArrayList<>();
