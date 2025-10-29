@@ -2,6 +2,7 @@ package com.vasubhakt.DevAllCPService.ServiceImpl;
 
 import org.springframework.stereotype.Service;
 
+import com.vasubhakt.DevAllCPService.Fetch.ACFetch;
 import com.vasubhakt.DevAllCPService.Fetch.CCFetch;
 import com.vasubhakt.DevAllCPService.Fetch.CFFetch;
 import com.vasubhakt.DevAllCPService.Fetch.LCFetch;
@@ -22,6 +23,7 @@ public class ExternalAPIServiceImpl implements ExternalAPIService {
     private final CFFetch cfFetch;
     private final LCFetch lcFetch;
     private final CCFetch ccFetch;
+    private final ACFetch acFetch;
 
     @Override
     public CFProfile fetchCfProfile(String handle) {
@@ -40,7 +42,7 @@ public class ExternalAPIServiceImpl implements ExternalAPIService {
 
     @Override
     public ACProfile fetchAcProfile(String handle) {
-        return new ACProfile();
+        return acFetch.fetchProfile(handle);
     }
 
 }

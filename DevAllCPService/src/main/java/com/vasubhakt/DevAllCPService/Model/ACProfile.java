@@ -14,8 +14,6 @@ public class ACProfile {
     private String handle;
     private Integer rating;
     private Integer maxRating;
-    private String rank;
 
     private List<ContestParticipation> contestHistory;
-    private Map<String, Integer> submissionHeatMap;
 }

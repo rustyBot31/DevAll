@@ -22,12 +22,15 @@ public class ACConsumer {
 
     @RabbitListener(queues = RabbitMQConfig.acQueue, concurrency = "3-5")
     public void handle(CPFetchRequest request) {
-        System.out.println("📩 Atcoder consumer received: " + request.getHandle());
+        System.out.println("📩 AtCoder consumer received: " + request.getHandle());
         Optional<CpProfile> optionalProfile = cpRepo.findByUsername(request.getUsername());
         CpProfile profile = optionalProfile.get();
-
-        ACProfile acProfile = externalApiService.fetchAcProfile(request.getHandle());
-        profile.setAcProfile(acProfile);
-        cpRepo.save(profile);
+        try {
+            ACProfile acProfile = externalApiService.fetchAcProfile(request.getHandle());
+            profile.setAcProfile(acProfile);
+            cpRepo.save(profile);
+        } catch(Exception e) {
+            System.err.println("❌ Error fetching AtCoder profile for " + request.getHandle() + ": " + e.getMessage());
+        }
     }
 }
