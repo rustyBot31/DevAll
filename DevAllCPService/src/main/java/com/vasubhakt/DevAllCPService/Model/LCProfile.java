@@ -17,7 +17,6 @@ public class LCProfile {
     private Integer mediumSolved;
     private Integer hardSolved;
 
-    private Double acceptanceRate;
     private Integer contestRating;
 
     private List<ContestParticipation> contestHistory;

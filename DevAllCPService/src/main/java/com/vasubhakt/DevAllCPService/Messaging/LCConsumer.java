@@ -23,12 +23,15 @@ public class LCConsumer {
 
     @RabbitListener(queues = RabbitMQConfig.lcQueue, concurrency = "3-5")
     public void handle(CPFetchRequest request) {
-        System.out.println("📩 Leetcode consumer received: " + request.getHandle());
+        System.out.println("📩 LeetCode consumer received: " + request.getHandle());
         Optional<CpProfile> optionalProfile = cpRepo.findByUsername(request.getUsername());
         CpProfile profile = optionalProfile.get();
-
-        LCProfile lcProfile = externalApiService.fetchLcProfile(request.getHandle());
-        profile.setLcProfile(lcProfile);
-        cpRepo.save(profile);
+        try {
+            LCProfile lcProfile = externalApiService.fetchLcProfile(request.getHandle());
+            profile.setLcProfile(lcProfile);
+            cpRepo.save(profile);
+        } catch(Exception e) {
+            System.err.println("❌ Error fetching LeetCode profile for " + request.getHandle() + ": " + e.getMessage());
+        }
     }
 }

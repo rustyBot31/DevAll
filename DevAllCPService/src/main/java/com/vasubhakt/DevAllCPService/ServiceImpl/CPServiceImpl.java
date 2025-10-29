@@ -21,9 +21,9 @@ public class CPServiceImpl implements CPService {
     }
     
     @Override
-    public void createUserProfile(String id) {
+    public void createUserProfile(String username) {
         CpProfile profile = new CpProfile();
-        profile.setUsername(id);
+        profile.setUsername(username);
         cpRepo.save(profile);
     }
 

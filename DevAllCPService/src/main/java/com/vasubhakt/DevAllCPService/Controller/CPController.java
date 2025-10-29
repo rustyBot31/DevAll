@@ -25,10 +25,10 @@ public class CPController {
     private final CPService cpService;
     private final CPProducer cpProducer;
 
-    @GetMapping("/get/{userId}")
-    public ResponseEntity<?> getUserProfile(@PathVariable String userId) {
+    @GetMapping("/get")
+    public ResponseEntity<?> getUserProfile(@RequestParam("username") String username) {
         try {
-            CpProfile profile = cpService.getUserProfile(userId);
+            CpProfile profile = cpService.getUserProfile(username);
             return ResponseEntity.ok(profile);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -45,20 +45,20 @@ public class CPController {
         }
     }
 
-    @PostMapping("/update/{userId}")
-    public ResponseEntity<?> updateUserProfile(@PathVariable String userId, @RequestBody CpProfile updatedProfile) {
+    @PostMapping("/update")
+    public ResponseEntity<?> updateUserProfile(@RequestParam("username") String username, @RequestBody CpProfile updatedProfile) {
         try {
-            CpProfile profile = cpService.updateUserProfile(userId, updatedProfile);
+            CpProfile profile = cpService.updateUserProfile(username, updatedProfile);
             return ResponseEntity.ok(profile);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     } 
 
-    @DeleteMapping("/delete/{userId}") 
-    public ResponseEntity<?> deleteUserProfile(@PathVariable String userId) {
+    @DeleteMapping("/delete") 
+    public ResponseEntity<?> deleteUserProfile(@RequestParam("username") String username) {
         try {
-            CpProfile profile = cpService.deleteUserProfile(userId);
+            CpProfile profile = cpService.deleteUserProfile(username);
             return ResponseEntity.ok(profile);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
