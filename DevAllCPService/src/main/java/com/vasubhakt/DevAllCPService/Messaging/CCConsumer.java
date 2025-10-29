@@ -26,9 +26,12 @@ public class CCConsumer {
         System.out.println("📩 Codechef consumer received: " + request.getHandle());
         Optional<CpProfile> optionalProfile = cpRepo.findByUsername(request.getUsername());
         CpProfile profile = optionalProfile.get();
-
-        CCProfile ccProfile = externalApiService.fetchCcProfile(request.getHandle());
-        profile.setCcProfile(ccProfile);
-        cpRepo.save(profile);
+        try {
+            CCProfile ccProfile = externalApiService.fetchCcProfile(request.getHandle());
+            profile.setCcProfile(ccProfile);
+            cpRepo.save(profile);
+        } catch(Exception e) {
+            System.err.println("❌ Error fetching Codechef profile for " + request.getHandle() + ": " + e.getMessage());
+        }
     }
 }

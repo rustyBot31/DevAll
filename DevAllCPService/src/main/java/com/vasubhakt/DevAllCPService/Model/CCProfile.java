@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 @Data
 @AllArgsConstructor
 @RequiredArgsConstructor
-
 public class CCProfile {
     private String handle;
     private Integer rating;
