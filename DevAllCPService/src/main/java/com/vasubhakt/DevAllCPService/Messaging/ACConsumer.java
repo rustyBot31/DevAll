@@ -27,6 +27,9 @@ public class ACConsumer {
         CpProfile profile = optionalProfile.get();
         try {
             ACProfile acProfile = externalApiService.fetchAcProfile(request.getHandle());
+            if(acProfile==null) {
+                throw new RuntimeException("Could not fetch profile");
+            }
             profile.setAcProfile(acProfile);
             cpRepo.save(profile);
         } catch(Exception e) {

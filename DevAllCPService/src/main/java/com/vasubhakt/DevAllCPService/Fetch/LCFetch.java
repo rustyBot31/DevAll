@@ -17,8 +17,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vasubhakt.DevAllCPService.Model.ContestParticipation;
 import com.vasubhakt.DevAllCPService.Model.LCProfile;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class LCFetch {
@@ -29,6 +34,9 @@ public class LCFetch {
     private static final String LEETCODE_GRAPHQL = "https://leetcode.com/graphql";
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
+    @CircuitBreaker(name = "lcbreaker", fallbackMethod = "lcFallback")
+    @Retry(name = "lcretry", fallbackMethod = "lcFallback")
+    @RateLimiter(name = "lcratelimiter", fallbackMethod = "lcFallback")
     public LCProfile fetchProfile(String handle) {
         try {
             // All calls in parallel
@@ -112,6 +120,11 @@ public class LCFetch {
         String response = restTemplate.postForObject(LEETCODE_GRAPHQL, request, String.class);
 
         return MAPPER.readTree(response);
+    }
+
+    public LCProfile lcFallback(String handle, Throwable t) {
+        log.warn("LeetCode fetch failed for {}: {}", handle, t.getMessage());
+        return null; // cleanly handled in the consumer
     }
 
 }

@@ -16,8 +16,13 @@ import org.springframework.stereotype.Service;
 import com.vasubhakt.DevAllCPService.Model.CCProfile;
 import com.vasubhakt.DevAllCPService.Model.ContestParticipation;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CCFetch {
@@ -26,6 +31,9 @@ public class CCFetch {
 
     private static final String BASE_URL = "https://www.codechef.com/users/";
 
+    @CircuitBreaker(name = "ccbreaker", fallbackMethod = "ccFallback")
+    @Retry(name = "ccretry", fallbackMethod = "ccFallback")
+    @RateLimiter(name = "ccratelimiter", fallbackMethod = "ccFallback")
     public CCProfile fetchProfile(String handle) {
         try {
             // Fetch profile HTML asynchronously
@@ -107,5 +115,10 @@ public class CCFetch {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public CCProfile ccFallback(String handle, Throwable t) {
+        log.warn("Codechef fetch failed for {}: {}", handle, t.getMessage());
+        return null; // cleanly handled in the consumer
     }
 }

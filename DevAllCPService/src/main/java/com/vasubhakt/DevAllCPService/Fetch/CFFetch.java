@@ -10,8 +10,13 @@ import org.springframework.web.client.RestTemplate;
 import com.vasubhakt.DevAllCPService.Model.CFProfile;
 import com.vasubhakt.DevAllCPService.Model.ContestParticipation;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CFFetch {
@@ -19,6 +24,9 @@ public class CFFetch {
     private final RestTemplate restTemplate;
     private final ExecutorService executor;
 
+    @CircuitBreaker(name = "cfbreaker", fallbackMethod = "cfFallback")
+    @Retry(name = "cfretry", fallbackMethod = "cfFallback")
+    @RateLimiter(name = "cfratelimiter", fallbackMethod = "cfFallback")
     public CFProfile fetchProfile(String handle) {
         try {
             // Run all calls in parallel
@@ -76,5 +84,10 @@ public class CFFetch {
         } catch (Exception e) {
             throw new RuntimeException("Failed to fetch Codeforces data for " + handle, e);
         }
+    }
+
+    public CFProfile cfFallback(String handle, Throwable t) {
+        log.warn("Codeforces fetch failed for {}: {}", handle, t.getMessage());
+        return null; // cleanly handled in the consumer
     }
 }

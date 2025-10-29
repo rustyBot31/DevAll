@@ -28,6 +28,9 @@ public class CCConsumer {
         CpProfile profile = optionalProfile.get();
         try {
             CCProfile ccProfile = externalApiService.fetchCcProfile(request.getHandle());
+            if(ccProfile==null) {
+                throw new RuntimeException("Could not fetch profile");
+            }
             profile.setCcProfile(ccProfile);
             cpRepo.save(profile);
         } catch(Exception e) {

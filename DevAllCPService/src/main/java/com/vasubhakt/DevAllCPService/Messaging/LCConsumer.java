@@ -28,6 +28,9 @@ public class LCConsumer {
         CpProfile profile = optionalProfile.get();
         try {
             LCProfile lcProfile = externalApiService.fetchLcProfile(request.getHandle());
+            if(lcProfile==null) {
+                throw new RuntimeException("Could not fetch profile");
+            }
             profile.setLcProfile(lcProfile);
             cpRepo.save(profile);
         } catch(Exception e) {
