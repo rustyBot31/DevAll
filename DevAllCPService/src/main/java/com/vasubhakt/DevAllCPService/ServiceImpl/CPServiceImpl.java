@@ -27,7 +27,8 @@ public class CPServiceImpl implements CPService {
         cpRepo.save(profile);
     }
 
-    @Override
+    // For testing
+    /*@Override
     public CpProfile updateUserProfile(String username, CpProfile updatedProfile) {
         CpProfile profile = cpRepo.findByUsername(username)
               .orElseThrow(() -> new RuntimeException("User CP Profile not found"));
@@ -44,7 +45,7 @@ public class CPServiceImpl implements CPService {
             profile.setAcProfile(updatedProfile.getAcProfile());
         }
         return cpRepo.save(profile);
-    }
+    }*/
 
     @Override
     public CpProfile deleteUserProfile(String username) {

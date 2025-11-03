@@ -45,7 +45,8 @@ public class CPController {
         }
     }
 
-    @PostMapping("/update")
+    // For testing
+    /*@PostMapping("/update")
     public ResponseEntity<?> updateUserProfile(@RequestParam("username") String username, @RequestBody CpProfile updatedProfile) {
         try {
             CpProfile profile = cpService.updateUserProfile(username, updatedProfile);
@@ -53,7 +54,7 @@ public class CPController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
-    } 
+    } */
 
     @DeleteMapping("/delete") 
     public ResponseEntity<?> deleteUserProfile(@RequestParam("username") String username) {

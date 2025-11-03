@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.vasubhakt.DevAllAuthService.client.CPClient;
+import com.vasubhakt.DevAllAuthService.client.ProjectClient;
 import com.vasubhakt.DevAllAuthService.dto.LoginRequest;
 import com.vasubhakt.DevAllAuthService.dto.LoginResponse;
 import com.vasubhakt.DevAllAuthService.dto.SignupRequest;
@@ -33,6 +34,7 @@ public class AuthServiceImpl implements AuthService {
     private final JwtUtil jwtUtil;
     private final EmailService emailService;
     private final CPClient cpClient;
+    private final ProjectClient projectClient;
 
     @Override
     @CircuitBreaker(name = "CPBreaker", fallbackMethod = "signupFallback")
@@ -77,6 +79,7 @@ public class AuthServiceImpl implements AuthService {
         }
         User user = optionalUser.get();
         cpClient.createCPProfile(user.getUsername());
+        projectClient.createProjectProfile(user.getUsername());
         user.setEnabled(true);
         user.setVerificationToken(null);
         userRepo.save(user);
