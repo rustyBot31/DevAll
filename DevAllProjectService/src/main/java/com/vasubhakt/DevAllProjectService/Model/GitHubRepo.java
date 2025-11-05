@@ -23,7 +23,4 @@ public class GitHubRepo {
     private List<String> topics;
     
     private Map<String, Integer> languageStats;
-    private Integer commits;
-    private Integer openIssues;
-    private Integer pullRequests;
 }

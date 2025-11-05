@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.vasubhakt.DevAllProjectService.Messaging.ProjectProducer;
+import com.vasubhakt.DevAllProjectService.Model.ProjectFetchRequest;
 import com.vasubhakt.DevAllProjectService.Model.ProjectProfile;
 import com.vasubhakt.DevAllProjectService.Service.ProjectService;
 
@@ -21,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 public class ProjectController {
     
     private final ProjectService projectService;
+    private final ProjectProducer projectProducer;
 
     @GetMapping("/get")
     public ResponseEntity<?> getUserProfile(@RequestParam("username") String username) {
@@ -57,6 +60,17 @@ public class ProjectController {
         try {
             ProjectProfile profile = projectService.deleteUserProfile(username);
             return ResponseEntity.ok(profile);
+        } catch(Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/fetch/{platform}")
+    public ResponseEntity<?> fetchProjectProfile(@PathVariable("platform") String platform, @RequestParam("handle") String handle, @RequestParam("username") String username) {
+        try {
+            ProjectFetchRequest request = new ProjectFetchRequest(username,platform,handle);
+            projectProducer.sendFetchRequest(request);
+            return ResponseEntity.ok("Request for fetch sent!");
         } catch(Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

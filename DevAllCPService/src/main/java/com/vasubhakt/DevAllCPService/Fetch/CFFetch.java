@@ -30,14 +30,16 @@ public class CFFetch {
     public CFProfile fetchProfile(String handle) {
         try {
             // Run all calls in parallel
-            CompletableFuture<Map<?, ?>> userFuture = CompletableFuture.supplyAsync(() ->
-                restTemplate.getForObject("https://codeforces.com/api/user.info?handles=" + handle, Map.class), executor);
+            CompletableFuture<Map<?, ?>> userFuture = CompletableFuture.supplyAsync(() -> restTemplate
+                    .getForObject("https://codeforces.com/api/user.info?handles=" + handle, Map.class), executor);
 
-            CompletableFuture<Map<?, ?>> contestFuture = CompletableFuture.supplyAsync(() ->
-                restTemplate.getForObject("https://codeforces.com/api/user.rating?handle=" + handle, Map.class), executor);
+            CompletableFuture<Map<?, ?>> contestFuture = CompletableFuture.supplyAsync(() -> restTemplate
+                    .getForObject("https://codeforces.com/api/user.rating?handle=" + handle, Map.class), executor);
 
-            CompletableFuture<Map<?, ?>> submissionsFuture = CompletableFuture.supplyAsync(() ->
-                restTemplate.getForObject("https://codeforces.com/api/user.status?handle=" + handle + "&from=1&count=2000", Map.class), executor);
+            CompletableFuture<Map<?, ?>> submissionsFuture = CompletableFuture.supplyAsync(() -> restTemplate
+                    .getForObject("https://codeforces.com/api/user.status?handle=" + handle + "&from=1&count=2000",
+                            Map.class),
+                    executor);
 
             CompletableFuture.allOf(userFuture, contestFuture, submissionsFuture).join();
 
@@ -59,22 +61,33 @@ public class CFFetch {
                         ((Number) c.get("oldRating")).intValue(),
                         ((Number) c.get("newRating")).intValue(),
                         Instant.ofEpochSecond(((Number) c.get("ratingUpdateTimeSeconds")).longValue())
-                                .atZone(ZoneOffset.UTC).toLocalDate().toString()
-                )).collect(Collectors.toList());
+                                .atZone(ZoneOffset.UTC).toLocalDate().toString()))
+                        .collect(Collectors.toList());
             }
 
             Map<?, ?> submissionsResp = submissionsFuture.get();
-            Map<String, Integer> submissionHeatMap = new HashMap<>();
+            Map<String, Integer> submissionHeatMap = new LinkedHashMap<>();
             if ("OK".equals(submissionsResp.get("status"))) {
                 @SuppressWarnings("unchecked")
                 List<Map<?, ?>> submissions = (List<Map<?, ?>>) submissionsResp.get("result");
+
                 LocalDate oneYearAgo = LocalDate.now(ZoneOffset.UTC).minusYears(1);
+                submissions.sort(Comparator.comparingLong(s -> ((Number) s.get("creationTimeSeconds")).longValue()));
+
                 for (Map<?, ?> sub : submissions) {
                     long epoch = ((Number) sub.get("creationTimeSeconds")).longValue();
                     LocalDate date = Instant.ofEpochSecond(epoch).atZone(ZoneOffset.UTC).toLocalDate();
-                    if (date.isBefore(oneYearAgo)) continue;
+                    if (date.isBefore(oneYearAgo))
+                        continue;
                     submissionHeatMap.merge(date.toString(), 1, Integer::sum);
                 }
+                submissionHeatMap = submissionHeatMap.entrySet().stream()
+                        .sorted(Map.Entry.comparingByKey())
+                        .collect(Collectors.toMap(
+                                Map.Entry::getKey,
+                                Map.Entry::getValue,
+                                (a, b) -> b,
+                                LinkedHashMap::new));
             }
 
             return new CFProfile(handle, rating, maxRating, submissionHeatMap, contestHistory);
