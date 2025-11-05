@@ -22,6 +22,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vasubhakt.DevAllProjectService.Model.GitHubProfile;
 import com.vasubhakt.DevAllProjectService.Model.GitHubRepo;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,6 +43,9 @@ public class GitHubFetch {
     @Value("${github.token}")
     private String TOKEN;
 
+    @CircuitBreaker(name = "githubbreaker", fallbackMethod = "gitHubFallback")
+    @Retry(name = "githubretry", fallbackMethod = "gitHubFallback")
+    @RateLimiter(name = "githubratelimiter", fallbackMethod = "gitHubFallback")
     public GitHubProfile fetchProfile(String username) {
         try {
             CompletableFuture<Map<?, ?>> profileFuture = CompletableFuture
@@ -156,7 +162,7 @@ public class GitHubFetch {
         }
     }
 
-    public GitHubProfile githubFallback(String username, Throwable t) {
+    public GitHubProfile gitHubFallback(String username, Throwable t) {
         log.warn("GitHub fetch failed for {}: {}", username, t.getMessage());
         return null;
     }

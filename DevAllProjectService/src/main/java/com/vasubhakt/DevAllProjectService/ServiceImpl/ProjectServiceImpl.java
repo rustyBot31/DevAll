@@ -27,14 +27,14 @@ public class ProjectServiceImpl implements ProjectService {
         projectRepo.save(profile);
     }
 
-    @Override
+    /*@Override  //For testing purpose only
     public ProjectProfile updateUserProfile(String username, ProjectProfile updatedProfile) {
         ProjectProfile existingProfile = projectRepo.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User Project Profile not found"));
         existingProfile.setGitHubProfile(updatedProfile.getGitHubProfile());
         projectRepo.save(existingProfile);
         return (existingProfile);
-    }
+    }*/
 
     @Override
     public ProjectProfile deleteUserProfile(String username) {

@@ -45,7 +45,7 @@ public class ProjectController {
         }
     }
 
-    @PostMapping("/update")
+    /*@PostMapping("/update") //For testing purpose only
     public ResponseEntity<?> updateUserProfile(@RequestParam("username") String username, @RequestBody ProjectProfile updatedProfile) {
         try {
             ProjectProfile profile = projectService.updateUserProfile(username, updatedProfile);
@@ -53,7 +53,7 @@ public class ProjectController {
         } catch(Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
-    }
+    }*/
 
     @DeleteMapping("/delete")
     public ResponseEntity<?> deleteUserProfile(@RequestParam("username") String username) {
