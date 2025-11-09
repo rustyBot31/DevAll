@@ -78,17 +78,12 @@ public class HuggingFaceFetch {
 
     private List<HuggingFaceModel> fetchModels(String username) {
         try {
-            String url = BASE_URL + "models?author=" + username;
+            String url = BASE_URL + "models?author=" + username + "&sort=lastModified&direction=-1&limit=10";
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, null, String.class);
             JsonNode root = MAPPER.readTree(response.getBody());
 
-            List<JsonNode> sortedModels = new ArrayList<>();
-            root.forEach(sortedModels::add);
-
-            sortedModels.sort((a, b) -> b.path("lastModifiedAt").asText("").compareTo(a.path("lastModifiedAt").asText("")));
-
             List<HuggingFaceModel> models = new ArrayList<>();
-            for (JsonNode m : sortedModels.stream().limit(10).toList()) {
+            for (JsonNode m : root) {
                 models.add(new HuggingFaceModel(
                         m.path("id").asText(),
                         m.path("modelId").asText(null),
@@ -108,18 +103,12 @@ public class HuggingFaceFetch {
 
     private List<HuggingFaceDataset> fetchDatasets(String username) {
         try {
-            String url = BASE_URL + "datasets?author=" + username;
+            String url = BASE_URL + "datasets?author=" + username + "&sort=lastModified&direction=-1&limit=10";
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, null, String.class);
             JsonNode root = MAPPER.readTree(response.getBody());
 
-            List<JsonNode> sortedDatasets = new ArrayList<>();
-            root.forEach(sortedDatasets::add);
-
-            sortedDatasets
-                    .sort((a, b) -> b.path("lastModifiedAt").asText("").compareTo(a.path("lastModifiedAt").asText("")));
-
             List<HuggingFaceDataset> datasets = new ArrayList<>();
-            for (JsonNode d : sortedDatasets.stream().limit(10).toList()) {
+            for (JsonNode d : root) {
                 datasets.add(new HuggingFaceDataset(
                         d.path("id").asText(),
                         d.path("datasetId").asText(null),
@@ -138,18 +127,12 @@ public class HuggingFaceFetch {
 
     private List<HuggingFaceSpace> fetchSpaces(String username) {
         try {
-            String url = BASE_URL + "spaces?author=" + username;
+            String url = BASE_URL + "spaces?author=" + username + "&sort=lastModified&direction=-1&limit=10";
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, null, String.class);
             JsonNode root = MAPPER.readTree(response.getBody());
 
-            List<JsonNode> sortedSpaces = new ArrayList<>();
-            root.forEach(sortedSpaces::add);
-
-            sortedSpaces
-                    .sort((a, b) -> b.path("lastModifiedAt").asText("").compareTo(a.path("lastModifiedAt").asText("")));
-
             List<HuggingFaceSpace> spaces = new ArrayList<>();
-            for (JsonNode s : sortedSpaces.stream().limit(10).toList()) {
+            for (JsonNode s : root) {
                 spaces.add(new HuggingFaceSpace(
                     s.path("id").asText(), 
                     s.path("spaceId").asText(null),
