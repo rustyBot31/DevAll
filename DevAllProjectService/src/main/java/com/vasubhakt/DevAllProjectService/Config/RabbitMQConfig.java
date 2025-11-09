@@ -19,9 +19,11 @@ public class RabbitMQConfig {
 
     //Queues
     public static final String gitHubQueue = "project.github.queue"; 
+    public static final String huggingFaceQueue = "project.huggingface.queue";
 
     //Routing Keys
     public static final String gitHubKey = "project.github.key";
+    public static final String huggingFaceKey = "project.huggingface.key";
 
     @Bean
     public TopicExchange exchange() {
@@ -34,8 +36,18 @@ public class RabbitMQConfig {
     }
 
     @Bean
+    public Queue huggingFaceQueue() {
+        return new Queue(huggingFaceQueue,true);
+    }
+
+    @Bean
     public Binding gitHubBinding(Queue gitHubQueue, TopicExchange exchange) {
         return BindingBuilder.bind(gitHubQueue).to(exchange).with(gitHubKey);
+    }
+
+    @Bean
+    public Binding huggingFaceBinding(Queue huggingFaceQueue, TopicExchange exchange) {
+        return BindingBuilder.bind(huggingFaceQueue).to(exchange).with(huggingFaceKey);
     }
 
     @Bean

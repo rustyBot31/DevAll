@@ -25,5 +25,6 @@ public class ProjectProfile {
     private String username;
 
     private GitHubProfile gitHubProfile;
+    private HuggingFaceProfile huggingFaceProfile;
 
 }
