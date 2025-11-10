@@ -23,7 +23,7 @@ public class GitHubConsumer {
 
     @RabbitListener(queues = RabbitMQConfig.gitHubQueue, concurrency = "3-5")
     public void handle(ProjectFetchRequest request) {
-        System.out.println("📩 Codeforces consumer received: " + request.getHandle());
+        System.out.println("📩 GitHub consumer received: " + request.getHandle());
         Optional<ProjectProfile> optionalProfile = projectRepo.findByUsername(request.getUsername());
         ProjectProfile profile = optionalProfile.get();
         try {
