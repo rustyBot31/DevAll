@@ -26,5 +26,6 @@ public class ProjectProfile {
 
     private GitHubProfile gitHubProfile;
     private HuggingFaceProfile huggingFaceProfile;
+    private GitLabProfile gitLabProfile;
 
 }

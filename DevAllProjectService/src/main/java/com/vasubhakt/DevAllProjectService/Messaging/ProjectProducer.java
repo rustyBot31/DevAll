@@ -27,6 +27,7 @@ public class ProjectProducer {
         String routingKey = switch(request.getPlatform().toLowerCase()) {
             case "github" -> RabbitMQConfig.gitHubKey;
             case "huggingface" -> RabbitMQConfig.huggingFaceKey;
+            case "gitlab" -> RabbitMQConfig.gitLabKey;
             default -> throw new IllegalArgumentException("Unsupported platform: " + request.getPlatform());
         };
 
