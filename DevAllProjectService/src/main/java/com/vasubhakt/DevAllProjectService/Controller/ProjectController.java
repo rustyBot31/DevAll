@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,8 +54,8 @@ public class ProjectController {
         }
     }*/
 
-    @DeleteMapping("/delete")
-    public ResponseEntity<?> deleteUserProfile(@RequestParam("username") String username) {
+    @DeleteMapping("/delete/{username}")
+    public ResponseEntity<?> deleteUserProfile(@PathVariable("username") String username) {
         try {
             ProjectProfile profile = projectService.deleteUserProfile(username);
             return ResponseEntity.ok(profile);

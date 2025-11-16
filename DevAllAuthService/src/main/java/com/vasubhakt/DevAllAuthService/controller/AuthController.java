@@ -67,4 +67,15 @@ public class AuthController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    //DELETE 
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> delete(@RequestParam("username") String username) {
+        try {
+            String message = authService.deleteUser(username);
+            return ResponseEntity.ok(message);
+        } catch(RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }

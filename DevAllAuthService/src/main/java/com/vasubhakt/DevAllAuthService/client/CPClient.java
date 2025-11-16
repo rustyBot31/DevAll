@@ -1,6 +1,7 @@
 package com.vasubhakt.DevAllAuthService.client;
 
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -9,5 +10,8 @@ public interface CPClient {
 
     @PostMapping("/cp/create/{username}")
     public void createCPProfile(@PathVariable("username") String username);
+
+    @DeleteMapping("/cp/delete/{username}")
+    public void deleteCPProfile(@PathVariable("username") String username);
     
 }

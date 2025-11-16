@@ -3,6 +3,7 @@ package com.vasubhakt.DevAllProjectService.Model;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.mongodb.lang.NonNull;
 
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 @AllArgsConstructor
 @RequiredArgsConstructor
 @NoArgsConstructor
+@Document(collection = "projectProfiles")
 public class ProjectProfile {
     
     @Id

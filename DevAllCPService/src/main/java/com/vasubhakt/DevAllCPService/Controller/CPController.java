@@ -55,8 +55,8 @@ public class CPController {
         }
     } */
 
-    @DeleteMapping("/delete") 
-    public ResponseEntity<?> deleteUserProfile(@RequestParam("username") String username) {
+    @DeleteMapping("/delete/{username}") 
+    public ResponseEntity<?> deleteUserProfile(@PathVariable("username") String username) {
         try {
             CpProfile profile = cpService.deleteUserProfile(username);
             return ResponseEntity.ok(profile);

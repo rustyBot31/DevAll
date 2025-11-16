@@ -1,9 +1,15 @@
 package com.vasubhakt.DevAllAuthService;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableAsync;
 
+@EnableAsync
 @EnableFeignClients
 @SpringBootApplication
 public class DevAllAuthServiceApplication {
@@ -12,4 +18,8 @@ public class DevAllAuthServiceApplication {
 		SpringApplication.run(DevAllAuthServiceApplication.class, args);
 	}
 
+	@Bean
+    public ExecutorService taskExecutor() {
+        return Executors.newFixedThreadPool(8);
+    }
 }

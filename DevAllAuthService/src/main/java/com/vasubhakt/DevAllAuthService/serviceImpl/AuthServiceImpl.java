@@ -2,14 +2,13 @@ package com.vasubhakt.DevAllAuthService.serviceImpl;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.vasubhakt.DevAllAuthService.client.CPClient;
-import com.vasubhakt.DevAllAuthService.client.ProjectClient;
 import com.vasubhakt.DevAllAuthService.dto.LoginRequest;
 import com.vasubhakt.DevAllAuthService.dto.LoginResponse;
 import com.vasubhakt.DevAllAuthService.dto.SignupRequest;
@@ -19,6 +18,7 @@ import com.vasubhakt.DevAllAuthService.repo.UserRepository;
 import com.vasubhakt.DevAllAuthService.security.JwtUtil;
 import com.vasubhakt.DevAllAuthService.service.AuthService;
 import com.vasubhakt.DevAllAuthService.service.EmailService;
+import com.vasubhakt.DevAllAuthService.service.ProfileService;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
@@ -33,13 +33,9 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authManager;
     private final JwtUtil jwtUtil;
     private final EmailService emailService;
-    private final CPClient cpClient;
-    private final ProjectClient projectClient;
+    private final ProfileService profileService;
 
     @Override
-    @CircuitBreaker(name = "CPBreaker", fallbackMethod = "signupFallback")
-    @Retry(name = "CPRetry", fallbackMethod = "signupFallback")
-    @RateLimiter(name = "CPRateLimiter", fallbackMethod = "signupFallback")
     public SignupResponse register(SignupRequest request) {
         if (userRepo.existsByEmail(request.getEmail())) {
             throw new RuntimeException("User with email already exists");
@@ -69,17 +65,21 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    @CircuitBreaker(name = "CPBreaker", fallbackMethod = "verifyFallback")
-    @Retry(name = "CPRetry", fallbackMethod = "verifyFallback")
-    @RateLimiter(name = "CPRateLimiter", fallbackMethod = "verifyFallback")
+    @CircuitBreaker(name = "SBreaker", fallbackMethod = "verifyFallback")
+    @Retry(name = "SRetry", fallbackMethod = "verifyFallback")
+    @RateLimiter(name = "SRateLimiter", fallbackMethod = "verifyFallback")
     public String verifyUser(String token) {
         Optional<User> optionalUser = userRepo.findByVerificationToken(token);
         if (optionalUser.isEmpty()) {
             throw new RuntimeException("Invalid verification token");
         }
         User user = optionalUser.get();
-        cpClient.createCPProfile(user.getUsername());
-        projectClient.createProjectProfile(user.getUsername());
+        CompletableFuture<Void> cpFuture = profileService.createCP(user.getUsername());
+        CompletableFuture<Void> projectFuture = profileService.createProject(user.getUsername());
+        CompletableFuture<Void> portfolioFuture = profileService.createPortfolio(user.getUsername());
+        // Wait for all three to finish
+        CompletableFuture.allOf(cpFuture, projectFuture, portfolioFuture).join();
+
         user.setEnabled(true);
         user.setVerificationToken(null);
         userRepo.save(user);
@@ -88,9 +88,6 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    @CircuitBreaker(name = "CPBreaker", fallbackMethod = "loginFallback")
-    @Retry(name = "CPRetry", fallbackMethod = "loginFallback")
-    @RateLimiter(name = "CPRateLimiter", fallbackMethod = "loginFallback")
     public LoginResponse login(LoginRequest request) {
         Optional<User> optionalUser = userRepo.findByEmail(request.getEmail());
         if (optionalUser.isEmpty()) {
@@ -109,9 +106,6 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    @CircuitBreaker(name = "CPBreaker", fallbackMethod = "resendFallback")
-    @Retry(name = "CPRetry", fallbackMethod = "resendFallback")
-    @RateLimiter(name = "CPRateLimiter", fallbackMethod = "resendFallback")
     public String resendVerificationEmail(String email) {
         Optional<User> optionalUser = userRepo.findByEmail(email);
         if (optionalUser.isEmpty()) {
@@ -132,32 +126,26 @@ public class AuthServiceImpl implements AuthService {
         return "Verification email resent successfully!";
     }
 
-    public SignupResponse signupFallback(SignupRequest request, Throwable t) {
-        if(t!=null) {
-            throw new RuntimeException("❌ Signup failed for " + request.getEmail() + ": " + t.getMessage());
-        } 
-        throw new RuntimeException("Service is currently unavailable. Please try again later.");
+    @Override
+    public String deleteUser(String username) {
+        Optional<User> optionalUser = userRepo.findByUsername(username);
+        if (optionalUser.isEmpty()) {
+            throw new RuntimeException("User with this email does not exist");
+        }
+        User user = optionalUser.get();
+        CompletableFuture<Void> cpDelFuture = profileService.deleteCP(user.getUsername());
+        CompletableFuture<Void> projectDelFuture = profileService.deleteProject(user.getUsername());
+        CompletableFuture<Void> portfolioDelFuture = profileService.deletePortfolio(user.getUsername());
+        // Wait for all three to finish
+        CompletableFuture.allOf(cpDelFuture, projectDelFuture, portfolioDelFuture).join();
+        userRepo.delete(user);
+        return "Account deleted successfully";
     }
 
     public String verifyFallback(String token, Throwable t) {
-        if(t!=null) {
+        if (t != null) {
             throw new RuntimeException("❌ Verification failed : " + t.getMessage());
-        } 
+        }
         throw new RuntimeException("Service is currently unavailable. Please try again later.");
     }
-
-    public LoginResponse loginFallback(LoginRequest request, Throwable t) {
-        if(t!=null) {
-            throw new RuntimeException("❌ Login failed for " + request.getEmail() + ": " + t.getMessage());
-        } 
-        throw new RuntimeException("Service is currently unavailable. Please try again later.");
-    }
-
-    public String resendFallback(String email, Throwable t) {
-        if(t!=null) {
-            throw new RuntimeException("❌ Failed to resend verification mail : " + t.getMessage());
-        } 
-        throw new RuntimeException("Service is currently unavailable. Please try again later.");
-    }
-
 }

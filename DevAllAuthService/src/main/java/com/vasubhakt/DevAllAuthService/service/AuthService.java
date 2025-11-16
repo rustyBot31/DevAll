@@ -11,4 +11,5 @@ public interface AuthService {
     String verifyUser(String token);
     LoginResponse login(LoginRequest request);
     String resendVerificationEmail(String email);
+    String deleteUser(String username);
 }
