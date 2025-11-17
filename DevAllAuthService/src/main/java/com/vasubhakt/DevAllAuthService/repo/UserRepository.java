@@ -1,5 +1,6 @@
 package com.vasubhakt.DevAllAuthService.repo;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.bson.types.ObjectId;
@@ -13,4 +14,7 @@ public interface UserRepository extends MongoRepository<User, ObjectId> {
     Optional<User> findByUsername(String username);
     boolean existsByEmail(String email);
     boolean existsByUsername(String username);
+    Optional<User> findByResetPasswordToken(String token);
+    void deleteAllByEnabledFalseAndCreatedAtBefore(LocalDateTime cutoff);
+
 }

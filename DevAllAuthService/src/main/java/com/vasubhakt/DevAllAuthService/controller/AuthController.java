@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.vasubhakt.DevAllAuthService.dto.LoginRequest;
 import com.vasubhakt.DevAllAuthService.dto.LoginResponse;
+import com.vasubhakt.DevAllAuthService.dto.ResetPasswordRequest;
 import com.vasubhakt.DevAllAuthService.dto.SignupRequest;
 import com.vasubhakt.DevAllAuthService.dto.SignupResponse;
 import com.vasubhakt.DevAllAuthService.service.AuthService;
@@ -73,6 +74,29 @@ public class AuthController {
     public ResponseEntity<?> delete(@RequestParam("username") String username) {
         try {
             String message = authService.deleteUser(username);
+            return ResponseEntity.ok(message);
+        } catch(RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    //FORGOT PASSWORD
+    @PostMapping("/forgotPass")
+    public ResponseEntity<?> forgotPassword(@RequestParam("email") String email) {
+        try {
+            String message = authService.forgotPassword(email);
+            return ResponseEntity.ok(message);
+        } catch(RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    //RESET PASSWORD
+    @PostMapping("/resetPass")
+    public ResponseEntity<?> resetPassword(@RequestParam("token") String token, @RequestBody ResetPasswordRequest request) {
+        try {
+            String newPassword = request.getNewPassword();
+            String message = authService.resetPassword(token, newPassword);
             return ResponseEntity.ok(message);
         } catch(RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

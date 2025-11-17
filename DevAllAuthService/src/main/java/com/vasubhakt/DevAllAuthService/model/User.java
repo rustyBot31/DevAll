@@ -1,5 +1,7 @@
 package com.vasubhakt.DevAllAuthService.model;
 
+import java.time.LocalDateTime;
+
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -24,13 +26,12 @@ public class User {
     @Email
     @Indexed(unique = true)
     private String email;
-
     private String password;
-
     private boolean enabled = false;
-    
     private String role = "USER";
-
     private String verificationToken;
+    private LocalDateTime createdAt = LocalDateTime.now();
+    private String resetPasswordToken;
+    private LocalDateTime resetPasswordTokenExpiry;
 
 }

@@ -1,5 +1,6 @@
 package com.vasubhakt.DevAllAuthService.serviceImpl;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -140,6 +141,41 @@ public class AuthServiceImpl implements AuthService {
         CompletableFuture.allOf(cpDelFuture, projectDelFuture, portfolioDelFuture).join();
         userRepo.delete(user);
         return "Account deleted successfully";
+    }
+
+    @Override
+    public String forgotPassword(String email) {
+        Optional<User> optionalUser = userRepo.findByEmail(email);
+        if(optionalUser.isEmpty()) {
+            throw new RuntimeException("No user found with this email");
+        }
+        User user = optionalUser.get();
+
+        String token = UUID.randomUUID().toString();
+        user.setResetPasswordToken(token);
+        user.setResetPasswordTokenExpiry(LocalDateTime.now().plusMinutes(30));
+        userRepo.save(user);
+
+        emailService.sendResetPasswordEmail(email,token);
+
+        return "Password reset link sent to your email";
+    }
+
+    @Override
+    public String resetPassword(String token, String newPassword) {
+        Optional<User> optionalUser = userRepo.findByResetPasswordToken(token);
+        if(optionalUser.isEmpty()) {
+            throw new RuntimeException("Invalid reset token. Try again!");
+        }
+        User user = optionalUser.get();
+        if(user.getResetPasswordTokenExpiry().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("Reset token expired");
+        }
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setResetPasswordToken(null);
+        user.setResetPasswordTokenExpiry(null);
+        userRepo.save(user);
+        return "Password reset successful";
     }
 
     public String verifyFallback(String token, Throwable t) {
