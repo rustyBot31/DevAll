@@ -17,7 +17,6 @@ public class GitHubRepo {
     private String description;
     private Integer stars;
     private Integer forks;
-    private Integer watchers;
     private String license;
     private String repoUrl;
     private List<String> topics;
