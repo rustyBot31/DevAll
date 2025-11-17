@@ -6,7 +6,6 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 
 import com.vasubhakt.DevAllProjectService.Config.RabbitMQConfig;
-import com.vasubhakt.DevAllProjectService.Model.GitHubProfile;
 import com.vasubhakt.DevAllProjectService.Model.GitLabProfile;
 import com.vasubhakt.DevAllProjectService.Model.ProjectFetchRequest;
 import com.vasubhakt.DevAllProjectService.Model.ProjectProfile;
