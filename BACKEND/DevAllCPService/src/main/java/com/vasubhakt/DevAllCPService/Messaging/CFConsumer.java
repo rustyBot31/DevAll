@@ -6,11 +6,11 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 
 import com.vasubhakt.DevAllCPService.Config.RabbitMQConfig;
+import com.vasubhakt.DevAllCPService.Fetch.CFFetch;
 import com.vasubhakt.DevAllCPService.Model.CFProfile;
 import com.vasubhakt.DevAllCPService.Model.CPFetchRequest;
 import com.vasubhakt.DevAllCPService.Model.CpProfile;
 import com.vasubhakt.DevAllCPService.Repo.CpProfileRepo;
-import com.vasubhakt.DevAllCPService.Service.ExternalAPIService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CFConsumer {
 
-    private final ExternalAPIService externalApiService;
+    private final CFFetch cfFetch;
     private final CpProfileRepo cpRepo;
     
     @RabbitListener(queues = RabbitMQConfig.cfQueue, concurrency = "3-5")
@@ -27,7 +27,7 @@ public class CFConsumer {
         Optional<CpProfile> optionalProfile = cpRepo.findByUsername(request.getUsername());
         CpProfile profile = optionalProfile.get();
         try {
-            CFProfile cfProfile = externalApiService.fetchCfProfile(request.getHandle());
+            CFProfile cfProfile = cfFetch.fetchProfile(request.getHandle());
             if(cfProfile==null) {
                 throw new RuntimeException("Could not fetch profile");
             }

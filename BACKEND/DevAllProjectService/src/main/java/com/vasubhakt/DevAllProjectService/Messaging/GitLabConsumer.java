@@ -6,11 +6,11 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 
 import com.vasubhakt.DevAllProjectService.Config.RabbitMQConfig;
+import com.vasubhakt.DevAllProjectService.Fetch.GitLabFetch;
 import com.vasubhakt.DevAllProjectService.Model.GitLabProfile;
 import com.vasubhakt.DevAllProjectService.Model.ProjectFetchRequest;
 import com.vasubhakt.DevAllProjectService.Model.ProjectProfile;
 import com.vasubhakt.DevAllProjectService.Repo.ProjectRepo;
-import com.vasubhakt.DevAllProjectService.Service.ExternalAPIService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class GitLabConsumer {
     
-    private final ExternalAPIService externalApiService;
+    private final GitLabFetch gitLabFetch;
     private final ProjectRepo projectRepo;
 
     @RabbitListener(queues = RabbitMQConfig.gitLabQueue, concurrency = "3-5")
@@ -27,7 +27,7 @@ public class GitLabConsumer {
         Optional<ProjectProfile> optionalProfile = projectRepo.findByUsername(request.getUsername());
         ProjectProfile profile = optionalProfile.get();
         try {
-            GitLabProfile gitLabProfile = externalApiService.fetchGitLabProfile(request.getHandle());
+            GitLabProfile gitLabProfile = gitLabFetch.fetchProfile(request.getHandle());
             if(gitLabProfile==null) {
                 throw new RuntimeException("Could not fetch profile");
             }

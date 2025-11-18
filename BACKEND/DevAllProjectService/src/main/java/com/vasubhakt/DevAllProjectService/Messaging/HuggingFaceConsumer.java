@@ -6,11 +6,11 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 
 import com.vasubhakt.DevAllProjectService.Config.RabbitMQConfig;
+import com.vasubhakt.DevAllProjectService.Fetch.HuggingFaceFetch;
 import com.vasubhakt.DevAllProjectService.Model.HuggingFaceProfile;
 import com.vasubhakt.DevAllProjectService.Model.ProjectFetchRequest;
 import com.vasubhakt.DevAllProjectService.Model.ProjectProfile;
 import com.vasubhakt.DevAllProjectService.Repo.ProjectRepo;
-import com.vasubhakt.DevAllProjectService.Service.ExternalAPIService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class HuggingFaceConsumer {
     
-    private final ExternalAPIService externalAPIService;
+    private final HuggingFaceFetch huggingFaceFetch;
     private final ProjectRepo projectRepo;
 
     @RabbitListener(queues = RabbitMQConfig.huggingFaceQueue, concurrency = "3-5")
@@ -27,7 +27,7 @@ public class HuggingFaceConsumer {
         Optional<ProjectProfile> optionalProfile = projectRepo.findByUsername(request.getUsername());
         ProjectProfile profile = optionalProfile.get();
         try {
-            HuggingFaceProfile huggingFaceProfile = externalAPIService.fetchHuggingFaceProfile(request.getHandle());
+            HuggingFaceProfile huggingFaceProfile = huggingFaceFetch.fetchProfile(request.getHandle());
             if(huggingFaceProfile==null) {
                 throw new RuntimeException("Could not fetch profile");
             }
